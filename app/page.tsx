@@ -1,102 +1,146 @@
+"use client";
 import Image from "next/image";
+import Carousel from "@/app/Components/Carousel/Carousel";
+import Contact from "@/app/Components/Contact/Contact";
+import { Navbar } from "@/app/Components/Nav/Navbar";
+import Footer from "./Components/Footer/Footer";
+import FloatingContactButton from "./Components/FloatingContactButton/FloatingContactButton";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="grid grid-rows-[auto_1fr_auto] bg-gradient-to-r from-gray-400 to-slate-500 min-h-screen font-[family-name:var(--font-geist-sans)]">
+      
+      {/* Navbar */}
+      <header className="row-start-1">
+        <Navbar />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+        {/* Banner image */}
+        <div className="relative w-full h-[500px]">
+          <Image
+            src="/images/track.jpg"
+            alt="Track"
+            fill
+            className="object-cover opacity-45"
+            priority
+          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <h1 className="text-slate-800 text-6xl sm:text-6xl mt-8 font-extrabold drop-shadow-4xl">
+              FineTuned Performance
+            </h1>
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/images/logos/logo.png"
+              alt="FineTuned Logo"
+              width={200}
+              height={100}
+              className="object-contain mt-4"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <h4 className="text-white text-4xl mt-6 drop-shadow-3xl font-bold">
+              Strength • Power • Speed
+            </h4>
+          </div>
         </div>
+
+        {/* Carousel */}
+        <section className="w-full pt-5 pb-5 bg-slate-800 shadow-lg">
+          <Carousel />
+        </section>
+      </header>
+
+      {/* Main Content */}
+      <main className="row-start-2 flex flex-col items-center gap-16 px-8 py-12 sm:px-20">
+        
+        {/* Welcome Section */}
+        <section className="text-center max-w-4xl">
+          <h1 className="text-3xl font-bold mb-4">Welcome to FineTuned Performance</h1>
+          <p className="text-2xl mb-8">
+            At FineTuned Performance, we specialize in helping athletes unlock their full potential. Through science-driven training, we enhance strength, power, and speed to prepare you for peak performance — every game, every season.
+          </p>
+        </section>
+
+        {/* Strength, Speed, Power Sections */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl text-white text-center">
+        {/* Strength */}
+          <div className="relative h-[300px] rounded-xl overflow-hidden shadow-lg group">
+            <Image
+              src="/images/strength.jpg"
+              alt="Strength"
+              fill
+              className="object-cover opacity-40 transition-transform duration-300 group-hover:scale-105"
+            />
+            
+            {/* Always visible title */}
+            <div className="absolute top-4 left-0 right-0 text-center z-10">
+              <h3 className="text-4xl font-extrabold drop-shadow-md">Strength</h3>
+            </div>
+
+            {/* Hover-only description */}
+            <div className="absolute inset-0 bg-slate-800 bg-opacity-60 flex flex-col items-center justify-center px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p className="text-xl font-semibold">
+                Build foundational power with resistance-based methods that enhance muscle function, joint stability, and force production.
+              </p>
+            </div>
+          </div>
+
+          {/* Power */}
+          <div className="relative h-[300px] rounded-xl overflow-hidden shadow-lg group">
+            <Image
+              src="/images/power.jpg"
+              alt="Power"
+              fill
+              className="object-cover opacity-40 transition-transform duration-300 group-hover:scale-105"
+            />
+            
+            <div className="absolute top-4 left-0 right-0 text-center z-10">
+              <h3 className="text-4xl font-extrabold drop-shadow-md">Power</h3>
+            </div>
+
+            <div className="absolute inset-0 bg-slate-800 bg-opacity-60 flex flex-col items-center justify-center px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p className="text-xl font-semibold">
+                Train explosive strength through Olympic lifts, plyometrics, and sport-specific high-intensity movements.
+              </p>
+            </div>
+          </div>
+
+          {/* Speed */}
+          <div className="relative h-[300px] rounded-xl overflow-hidden shadow-lg group">
+            <Image
+              src="/images/sprint.jpg"
+              alt="Speed"
+              fill
+              className="object-cover opacity-40 transition-transform duration-300 group-hover:scale-105"
+            />
+            
+            <div className="absolute top-4 left-0 right-0 text-center z-10">
+              <h3 className="text-4xl font-extrabold drop-shadow-md">Speed</h3>
+            </div>
+
+            <div className="absolute inset-0 bg-slate-800 bg-opacity-60 flex flex-col items-center justify-center px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p className="text-xl font-semibold">
+                Increase your velocity, reaction time, and agility with drills focused on mechanics and multidirectional explosiveness.
+              </p>
+            </div>
+          </div>
+
+        </section>
+
+
+
+        {/* Floating Contact Button */}
+        <FloatingContactButton />
+
+        {/* Contact Section */}
+        <section id="contact" className="text-center max-w-3xl">
+          <h2 className="text-3xl font-bold mb-6">Get in Touch</h2>
+          <p className="text-2xl mb-8">
+            Have questions or want to learn more about our training programs? Fill out the form below and we'll get back to you as soon as possible.
+          </p>
+          <Contact />
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="row-start-3 w-full flex gap-6 py-4 items-center justify-center">
+        <Footer />
       </footer>
     </div>
   );

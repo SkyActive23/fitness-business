@@ -4,7 +4,6 @@ import Image from "next/image";
 import { Navbar } from "@/app/Components/Nav/Navbar";
 import Footer from "../Components/Footer/Footer";
 import FloatingContactButton from "../Components/FloatingContactButton/FloatingContactButton";
-import BackgroundLogo from "../Components/LogoBackground/LogoBackground";
 
 export default function AboutPage() {
   return (
@@ -74,7 +73,7 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold mb-4 text-center md:text-left text-white">Who We Train</h2>
                 <p className="text-xl leading-relaxed text-slate-200 text-center md:text-left">
                     We work with youth athletes, collegiate players, professionals, and dedicated weekend warriors.
-                    Whether you're preparing for your season, a combine, or lifelong fitness — we’ve got a plan for you.
+                    Whether you're preparing for your season, a combine, or lifelong fitness — we&apos;ve got a plan for you.
                 </p>
                 </div>
 

@@ -133,7 +133,7 @@ export default function Home() {
         <section id="contact" className="text-center max-w-3xl">
           <h2 className="text-3xl font-bold mb-6">Get in Touch</h2>
           <p className="text-2xl mb-8">
-            Have questions or want to learn more about our training programs? Fill out the form below and we'll get back to you as soon as possible.
+            Have questions or want to learn more about our training programs? Fill out the form below and we&apos;ll get back to you as soon as possible.
           </p>
           <Contact />
         </section>

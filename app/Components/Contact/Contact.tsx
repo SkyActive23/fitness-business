@@ -13,12 +13,11 @@ const ContactForm = () => {
 
     if (!form.current) return;
 
-    emailjs
-      .sendForm(
-        'service_zmlgupk',   // e.g. 'service_123xyz'
-        'template_rjp9hhk',  // e.g. 'template_abc456'
+    emailjs.sendForm(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
         form.current,
-        'xtw6G0bPaglrMOySb'    // e.g. 'ABCdEfGh12345'
+        process.env.NEXT_PUBLIC_EMAILJS_USER_ID!
       )
       .then(
         (result) => {

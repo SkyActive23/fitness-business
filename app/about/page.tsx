@@ -73,7 +73,7 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold mb-4 text-center md:text-center text-white">Who We Train</h2>
                 <p className="text-xl leading-relaxed text-slate-200 text-center md:text-left">
                     We work with youth athletes, collegiate players, professionals, and dedicated weekend warriors.
-                    Whether you're preparing for your season, a combine, or lifelong fitness — we've got a plan for you.
+                    Whether you&apos;re preparing for your season, a combine, or lifelong fitness — we&apos;ve got a plan for you.
                 </p>
                 </div>
 
@@ -108,7 +108,7 @@ export default function AboutPage() {
               />
               <h3 className="text-2xl font-bold mb-2">Skyler Hollingsworth, CSCS</h3>
               <p className="text-slate-300 text-lg">
-                A decade in high-performance training, former Strength Coach at The MMA LAB and current Strength and Conditioning Coach at Glendale Community College. Specializing in strength, speed, and injury resilience for elite and emerging athletes. Holds a Bachelor's Degree in Exercise Science with an emphasis on Sport Performance from Arizona State University.
+                A decade in high-performance training, former Strength Coach at The MMA LAB and current Strength and Conditioning Coach at Glendale Community College. Specializing in strength, speed, and injury resilience for elite and emerging athletes. Holds a Bachelor&apos;s Degree in Exercise Science with an emphasis on Sport Performance from Arizona State University.
               </p>
             </div>
 
@@ -123,7 +123,7 @@ export default function AboutPage() {
               />
               <h3 className="text-2xl font-bold mb-2">Michael Woods, CSCS</h3>
               <p className="text-slate-300 text-lg">
-                Former collegiate football player at Glendale Community College and current Strength and Conditioning Coach at GCC. Michael brings a competitive edge and a deep understanding of athletic performance to his coaching. He holds a Bachelor's Degree in Kinesiology from Concordia University Chicago and is dedicated to developing strength, power, and resilience in athletes at all levels.
+                Former collegiate football player at Glendale Community College and current Strength and Conditioning Coach at GCC. Michael brings a competitive edge and a deep understanding of athletic performance to his coaching. He holds a Bachelor&apos;s Degree in Kinesiology from Concordia University Chicago and is dedicated to developing strength, power, and resilience in athletes at all levels.
               </p>
             </div>
           </div>

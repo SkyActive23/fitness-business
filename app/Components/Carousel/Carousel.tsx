@@ -17,7 +17,7 @@ const images = [
 
 export default function Carousel() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
+  const [sliderRef] = useKeenSlider<HTMLDivElement>({
     loop: true,
     slides: {
       perView: images.length, // All images visible in one row

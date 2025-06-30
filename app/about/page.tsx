@@ -70,10 +70,10 @@ export default function AboutPage() {
                 
                 {/* Text on the left */}
                 <div className="md:w-1/2 w-full">
-                <h2 className="text-3xl font-bold mb-4 text-center md:text-left text-white">Who We Train</h2>
+                <h2 className="text-3xl font-bold mb-4 text-center md:text-center text-white">Who We Train</h2>
                 <p className="text-xl leading-relaxed text-slate-200 text-center md:text-left">
                     We work with youth athletes, collegiate players, professionals, and dedicated weekend warriors.
-                    Whether you're preparing for your season, a combine, or lifelong fitness — we&apos;ve got a plan for you.
+                    Whether you're preparing for your season, a combine, or lifelong fitness — we've got a plan for you.
                 </p>
                 </div>
 
@@ -89,7 +89,6 @@ export default function AboutPage() {
                 </div>
             </div>
         </section>
-
 
         {/* Divider */}
         <hr className="border-t border-4 rounded-full border-slate-200 w-4/5 mx-auto my-12" />
@@ -129,8 +128,8 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
-        {/* Floating Contact Button */}
       </main>
+
       <FloatingContactButton />
 
       {/* Footer */}

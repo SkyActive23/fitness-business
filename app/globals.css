@@ -19,6 +19,14 @@
   }
 }
 
+/* styles/globals.css */
+.bg-logo-pattern {
+  background-image: url('/images/logos/logo.png');
+  background-repeat: repeat;
+  background-size: 150px;
+  opacity: 0.05;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

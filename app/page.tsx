@@ -5,11 +5,11 @@ import Contact from "@/app/Components/Contact/Contact";
 import { Navbar } from "@/app/Components/Nav/Navbar";
 import Footer from "./Components/Footer/Footer";
 import FloatingContactButton from "./Components/FloatingContactButton/FloatingContactButton";
+import BackgroundLogo from "./Components/LogoBackground/LogoBackground";
 
 export default function Home() {
   return (
     <div className="grid grid-rows-[auto_1fr_auto] bg-gradient-to-r from-gray-400 to-slate-500 min-h-screen font-[family-name:var(--font-geist-sans)]">
-      
       {/* Navbar */}
       <header className="row-start-1">
         <Navbar />
@@ -39,7 +39,6 @@ export default function Home() {
             </h4>
           </div>
         </div>
-
         {/* Carousel */}
         <section className="w-full pt-5 pb-5 bg-slate-800 shadow-lg">
           <Carousel />
@@ -49,6 +48,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="row-start-2 flex flex-col items-center gap-16 px-8 py-12 sm:px-20">
         
+
         {/* Welcome Section */}
         <section className="text-center max-w-4xl">
           <h1 className="text-3xl font-bold mb-4">Welcome to FineTuned Performance</h1>
@@ -75,6 +75,7 @@ export default function Home() {
 
             {/* Hover-only description */}
             <div className="absolute inset-0 bg-slate-800 bg-opacity-60 flex flex-col items-center justify-center px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <BackgroundLogo opacity={0.1} size={500} position="center" />
               <p className="text-xl font-semibold">
                 Build foundational power with resistance-based methods that enhance muscle function, joint stability, and force production.
               </p>
@@ -95,6 +96,7 @@ export default function Home() {
             </div>
 
             <div className="absolute inset-0 bg-slate-800 bg-opacity-60 flex flex-col items-center justify-center px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <BackgroundLogo opacity={0.1} size={500} position="center" />
               <p className="text-xl font-semibold">
                 Train explosive strength through Olympic lifts, plyometrics, and sport-specific high-intensity movements.
               </p>
@@ -115,6 +117,7 @@ export default function Home() {
             </div>
 
             <div className="absolute inset-0 bg-slate-800 bg-opacity-60 flex flex-col items-center justify-center px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <BackgroundLogo opacity={0.1} size={500} position="center" />
               <p className="text-xl font-semibold">
                 Increase your velocity, reaction time, and agility with drills focused on mechanics and multidirectional explosiveness.
               </p>
@@ -122,8 +125,6 @@ export default function Home() {
           </div>
 
         </section>
-
-
 
         {/* Floating Contact Button */}
         <FloatingContactButton />

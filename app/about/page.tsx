@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Navbar } from "@/app/Components/Nav/Navbar";
 import Footer from "../Components/Footer/Footer";
 import FloatingContactButton from "../Components/FloatingContactButton/FloatingContactButton";
+import BackgroundLogo from "../Components/LogoBackground/LogoBackground";
 
 export default function AboutPage() {
   return (
@@ -56,15 +57,13 @@ export default function AboutPage() {
             {/* Text on the right */}
             <div className="md:w-1/2 w-full">
               <h2 className="text-3xl font-bold mb-4 text-center md:text-center text-white">Our Mission</h2>
+              
               <p className="text-xl leading-relaxed text-slate-200 text-center md:text-left">
                 At FineTuned Performance, we help athletes unlock their peak performance by training smarter. Our programs fuse modern science, individualized coaching, and elite-level experience to build athletes who dominate their game.
               </p>
             </div>
           </div>
         </section>
-
-        {/* Divider */}
-        {/* <hr className="border-t border-4 rounded-full border-slate-800 w-full mx-auto my-12" /> */}
 
         {/* Who We Train Section */}
         <section className="w-full bg-slate-800 rounded-lg py-16  mt-12 px-6 sm:px-12 mb-15">
@@ -111,24 +110,24 @@ export default function AboutPage() {
               />
               <h3 className="text-2xl font-bold mb-2">Skyler Hollingsworth, CSCS</h3>
               <p className="text-slate-300 text-lg">
-                A decade in high-performance training, former Strength Coach at MMA Lab and current Strength and Conditioning Coach at GCC. Specializing in strength, speed, and injury resilience for elite and emerging athletes.
+                A decade in high-performance training, former Strength Coach at The MMA LAB and current Strength and Conditioning Coach at Glendale Community College. Specializing in strength, speed, and injury resilience for elite and emerging athletes. Holds a Bachelor's Degree in Exercise Science with an emphasis on Sport Performance from Arizona State University.
               </p>
             </div>
 
             {/* Coach 2 */}
-            {/* <div className="bg-slate-800 rounded-xl p-6 shadow-xl text-center hover:scale-105 transition-transform duration-300">
+            <div className="bg-slate-800 rounded-xl p-6 shadow-xl text-center hover:scale-105 transition-transform duration-300">
               <Image
                 src="/images/coach-jane.jpg"
-                alt="Coach Jane"
+                alt="Coach Mike"
                 width={160}
                 height={160}
                 className="mx-auto rounded-full mb-4 object-cover"
               />
-              <h3 className="text-2xl font-bold mb-2">Jane Matthews, MS, CSCS</h3>
+              <h3 className="text-2xl font-bold mb-2">Michael Woods, CSCS</h3>
               <p className="text-slate-300 text-lg">
-                Passionate about female performance development. Master’s in Exercise Science and years of coaching experience across collegiate programs.
+                Former collegiate football player at Glendale Community College and current Strength and Conditioning Coach at GCC. Michael brings a competitive edge and a deep understanding of athletic performance to his coaching. He holds a Bachelor's Degree in Kinesiology from Concordia University Chicago and is dedicated to developing strength, power, and resilience in athletes at all levels.
               </p>
-            </div> */}
+            </div>
           </div>
         </section>
         {/* Floating Contact Button */}

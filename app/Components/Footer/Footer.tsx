@@ -12,9 +12,10 @@ import {
 const Footer: React.FC = () => {
   return (
     <footer className="bg-gray-900 w-full text-white relative overflow-hidden">
-      <div className="max-w-7xl mt-5 mx-auto px-4 py-4 relative">
-        {/* Logo on the left */}
-        <div className="flex items-center justify-start">
+      <div className="max-w-7xl mt-5 mx-auto px-4 py-4 relative flex flex-col sm:block items-center sm:items-start gap-6">
+        
+        {/* Logo */}
+        <div className="sm:static flex justify-center sm:justify-start mb-4 sm:mb-0">
           <Image
             src="/images/logos/logoFT.png"
             alt="FineTuned Performance Logo"
@@ -24,30 +25,30 @@ const Footer: React.FC = () => {
           />
         </div>
 
-        {/* Social Icons centered absolutely */}
-        <div className="absolute top-5 left-1/2 transform -translate-x-1/2">
-          <div className="flex space-x-6">
-            <a href="#" className="p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
-              <FaFacebook className="text-black hover:text-white text-2xl" />
+        {/* Social Icons */}
+        <div className="sm:absolute sm:top-5 sm:left-1/2 sm:transform sm:-translate-x-1/2">
+          <div className="flex flex-wrap justify-center sm:justify-center space-x-4 sm:space-x-6">
+            <a href="#" className="p-2 sm:p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
+              <FaFacebook className="text-black hover:text-white text-xl sm:text-2xl" />
             </a>
-            <a href="#" className="p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
-              <FaInstagram className="text-black hover:text-white text-2xl" />
+            <a href="#" className="p-2 sm:p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
+              <FaInstagram className="text-black hover:text-white text-xl sm:text-2xl" />
             </a>
-            <a href="#" className="p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
-              <FaTwitter className="text-black hover:text-white text-2xl" />
+            <a href="#" className="p-2 sm:p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
+              <FaTwitter className="text-black hover:text-white text-xl sm:text-2xl" />
             </a>
-            <a href="#" className="p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
-              <FaGooglePlus className="text-black hover:text-white text-2xl" />
+            <a href="#" className="p-2 sm:p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
+              <FaGooglePlus className="text-black hover:text-white text-xl sm:text-2xl" />
             </a>
-            <a href="#" className="p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
-              <FaYoutube className="text-black hover:text-white text-2xl" />
+            <a href="#" className="p-2 sm:p-3 bg-white rounded-full hover:bg-gray-900 transition duration-500">
+              <FaYoutube className="text-black hover:text-white text-xl sm:text-2xl" />
             </a>
           </div>
         </div>
 
-        {/* Navigation links */}
-        <nav className="mb-5">
-          <ul className="flex justify-center space-x-8 text-lg">
+        {/* Navigation Links */}
+        <nav className="w-full mt-6 sm:mt-5">
+          <ul className="flex flex-wrap justify-center sm:justify-center space-x-4 sm:space-x-8 text-base sm:text-lg">
             <li><a href="#" className="hover:opacity-100 opacity-70 transition duration-500">Home</a></li>
             <li><a href="#" className="hover:opacity-100 opacity-70 transition duration-500">News</a></li>
             <li><a href="#" className="hover:opacity-100 opacity-70 transition duration-500">About</a></li>
@@ -58,10 +59,9 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Bottom copyright */}
-      <div className="bg-black py-4 text-center">
+      <div className="bg-black py-4 text-center text-sm sm:text-base">
         <p className="text-white">
-          Copyright &copy; 2025; Designed by{' '}
-          <span className="opacity-70 uppercase tracking-wider">FineTuned Performance</span>
+          &copy; 2025 FineTuned Performance — All rights reserved.
         </p>
       </div>
     </footer>

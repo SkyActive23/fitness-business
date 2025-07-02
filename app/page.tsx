@@ -32,7 +32,7 @@ export default function Home() {
           priority
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-white text-3xl sm:text-6xl font-extrabold drop-shadow-lg">
+          <h1 className="text-slate-800 text-3xl sm:text-6xl font-extrabold drop-shadow-lg  mt-10 sm:mt-0">
             FineTuned Performance
           </h1>
           <Image

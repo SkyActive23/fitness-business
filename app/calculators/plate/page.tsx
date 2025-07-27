@@ -40,7 +40,7 @@ export default function PlateCalculatorPage() {
     let sideWeight = (total - bar) / 2;
     const counts: number[] = [];
 
-    for (let plate of plates) {
+    for (const plate of plates) {
       const count = Math.floor(sideWeight / plate);
       counts.push(count);
       sideWeight -= count * plate;

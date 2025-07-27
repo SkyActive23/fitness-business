@@ -19,13 +19,16 @@ export default function AboutPage() {
 
         {/* Logo & Hero Title */}
         <div className="flex flex-col mt-20 items-center mb-12 text-center">
-          <div className="relative w-full max-w-md aspect-[4/3] bg-slate-800 mb-8 rounded-lg shadow-2xl flex items-center justify-center px-4">
-            <Image
-              src="/images/logos/logoFT.png"
-              alt="FineTuned Logo"
-              fill
-              className="object-contain"
-            />
+          <div className="flex justify-center mb-8">
+            <div className="w-full max-w-md aspect-[4/3] bg-slate-800 rounded-lg shadow-2xl flex items-center justify-center p-6">
+              <Image
+                src="/images/logos/logoFT.png"
+                alt="FineTuned Logo"
+                width={300}
+                height={300}
+                className="object-contain ml-20 mr-20 "
+              />
+            </div>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-extrabold drop-shadow-lg">

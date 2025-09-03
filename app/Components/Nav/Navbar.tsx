@@ -71,6 +71,13 @@ export const Navbar = () => {
                   >
                     Plate Calculator
                   </Link>
+                  <Link
+                    href='/calculators/percentiles'
+                    className='block px-4 py-2 hover:bg-slate-600'
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    Percentiles
+                  </Link>
                 </div>
               )}
             </div>

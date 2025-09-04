@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { Suspense, useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+
+export const dynamic = 'force-dynamic'; // opt out of static prerender; safe with search params
 
 const PLATES_LBS_BASE = [45, 25, 10, 5, 2.5] as const;
 const PLATES_KG = [20, 15, 10, 5, 2.5, 1.25] as const;
 
 const PLATE_COLORS: Record<number, string> = {
-  100: 'bg-zinc-900', // 100 lb plate
+  100: 'bg-zinc-900',
   45: 'bg-black',
   25: 'bg-red-700',
   20: 'bg-red-700',
@@ -19,7 +21,20 @@ const PLATE_COLORS: Record<number, string> = {
   1.25: 'bg-purple-500',
 };
 
-export default function PlateCalculatorPage() {
+// --- Wrapper required by Next to allow useSearchParams in App Router ---
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Loading calculator...
+      </div>
+    }>
+      <PlateCalculatorPage />
+    </Suspense>
+  );
+}
+
+function PlateCalculatorPage() {
   const searchParams = useSearchParams();
 
   const [totalWeight, setTotalWeight] = useState('');
@@ -31,7 +46,7 @@ export default function PlateCalculatorPage() {
 
   // 100 lb plate controls
   const [useHundreds, setUseHundreds] = useState<boolean>(false);
-  const [hundredsAvailable, setHundredsAvailable] = useState<number>(0); // total across bar
+  const [hundredsAvailable, setHundredsAvailable] = useState<number>(0);
 
   // Internal flag to auto-run calculate when ?calc=1 is present
   const [autoCalc, setAutoCalc] = useState(false);
@@ -53,7 +68,6 @@ export default function PlateCalculatorPage() {
     setPlateCounts([]);
     setUnloadableRemainder(0);
 
-    // 100s only apply in lbs
     if (nextUnit === 'kg') {
       setUseHundreds(false);
       setHundredsAvailable(0);
@@ -69,7 +83,6 @@ export default function PlateCalculatorPage() {
       return;
     }
 
-    // If toggle is on but user didn't specify a valid number, treat as 0 available
     const maxHundredsPerSide =
       unit === 'lbs' && useHundreds ? Math.floor(Math.max(0, hundredsAvailable) / 2) : 0;
 
@@ -78,20 +91,15 @@ export default function PlateCalculatorPage() {
 
     for (const plate of plates) {
       let count = Math.floor(sideWeight / plate);
-
-      // Cap 100 lb usage per side
       if (unit === 'lbs' && plate === 100) {
         count = Math.min(count, maxHundredsPerSide);
       }
-
       counts.push(count);
       sideWeight -= count * plate;
     }
 
-    // Clean tiny float residue
     const epsilon = 0.0001;
     const remainder = Math.abs(sideWeight) < epsilon ? 0 : parseFloat(sideWeight.toFixed(2));
-
     setPlateCounts(counts);
     setUnloadableRemainder(remainder);
   };
@@ -127,7 +135,7 @@ export default function PlateCalculatorPage() {
     maxHundredsPerSide > 0 &&
     usedHundredsPerSide === maxHundredsPerSide;
 
-  // --- Read query params on mount ---
+  // Read query params on mount
   useEffect(() => {
     const t = searchParams.get('target');
     const u = (searchParams.get('unit') || '').toLowerCase();
@@ -142,14 +150,8 @@ export default function PlateCalculatorPage() {
       }
     }
 
-    if (t) {
-      setTotalWeight(t);
-    }
-
-    // Only auto-calc if explicitly requested
-    if (c === '1') {
-      setAutoCalc(true);
-    }
+    if (t) setTotalWeight(t);
+    if (c === '1') setAutoCalc(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -277,7 +279,6 @@ export default function PlateCalculatorPage() {
               ) : null
             )}
 
-            {/* Feedback messages */}
             {unit === 'lbs' && useHundreds && hundredIndex >= 0 && hundredsAvailable > 0 && (
               <p className="mt-2 text-sm text-slate-200">
                 Using <span className="font-semibold">{usedHundredsPerSide}</span> × 100 lb per side

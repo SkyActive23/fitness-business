@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
 const PLATES_LBS_BASE = [45, 25, 10, 5, 2.5] as const;
@@ -19,6 +20,8 @@ const PLATE_COLORS: Record<number, string> = {
 };
 
 export default function PlateCalculatorPage() {
+  const searchParams = useSearchParams();
+
   const [totalWeight, setTotalWeight] = useState('');
   const [barbellWeight, setBarbellWeight] = useState('45');
   const [unit, setUnit] = useState<'lbs' | 'kg'>('lbs');
@@ -29,6 +32,9 @@ export default function PlateCalculatorPage() {
   // 100 lb plate controls
   const [useHundreds, setUseHundreds] = useState<boolean>(false);
   const [hundredsAvailable, setHundredsAvailable] = useState<number>(0); // total across bar
+
+  // Internal flag to auto-run calculate when ?calc=1 is present
+  const [autoCalc, setAutoCalc] = useState(false);
 
   // Build plate list from state
   const plates: number[] = useMemo(() => {
@@ -120,6 +126,41 @@ export default function PlateCalculatorPage() {
     hundredIndex >= 0 &&
     maxHundredsPerSide > 0 &&
     usedHundredsPerSide === maxHundredsPerSide;
+
+  // --- Read query params on mount ---
+  useEffect(() => {
+    const t = searchParams.get('target');
+    const u = (searchParams.get('unit') || '').toLowerCase();
+    const c = searchParams.get('calc');
+
+    if (u === 'lbs' || u === 'kg') {
+      setUnit(u as 'lbs' | 'kg');
+      setBarbellWeight(u === 'lbs' ? '45' : '20');
+      if (u === 'kg') {
+        setUseHundreds(false);
+        setHundredsAvailable(0);
+      }
+    }
+
+    if (t) {
+      setTotalWeight(t);
+    }
+
+    // Only auto-calc if explicitly requested
+    if (c === '1') {
+      setAutoCalc(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-calc when requested and we have a target
+  useEffect(() => {
+    if (autoCalc && totalWeight) {
+      calculatePlates();
+      setAutoCalc(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoCalc, totalWeight, unit, barbellWeight, useHundreds, hundredsAvailable]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-400 to-slate-700 text-white px-4 py-10 pt-24 mt-5 ">

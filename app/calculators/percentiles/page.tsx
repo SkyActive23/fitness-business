@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 // Rep mapping for key percents
 const PERCENT_REPS: Record<number, number> = {
@@ -21,9 +22,10 @@ const PERCENT_REPS: Record<number, number> = {
   65: 20,
 };
 
-// Full percent list (descending), combining reps + extras
+// Extra lower percents (no reps shown)
 const EXTRA_PERCENTS = [62, 60, 57, 55, 52, 50];
 
+// Full percent list (descending)
 const PERCENTAGES = [...Object.keys(PERCENT_REPS).map(Number), ...EXTRA_PERCENTS].sort(
   (a, b) => b - a
 );
@@ -40,7 +42,23 @@ function roundTo5(num: number): number {
 }
 
 export default function PercentilesPage() {
+  const router = useRouter();
   const weights = useMemo(() => buildWeights(60, 700, 5), []);
+
+  // --- Quick Finder state ---
+  const [oneRepMax, setOneRepMax] = useState<string>('');
+  const [percent, setPercent] = useState<number>(95); // default 95%
+
+  const targetWeight = useMemo(() => {
+    const max = parseFloat(oneRepMax);
+    if (Number.isNaN(max) || max <= 0) return '';
+    return String(roundTo5((max * percent) / 100));
+  }, [oneRepMax, percent]);
+
+  const handleRedirect = () => {
+    if (!targetWeight) return;
+    router.push(`/calculators/plate?target=${targetWeight}`);
+  };
 
   const csv = useMemo(() => {
     const header = ['Weight (lb)', ...PERCENTAGES.map(p => {
@@ -109,6 +127,61 @@ export default function PercentilesPage() {
           Weight Percentiles with Rep Ranges (60–700 lb)
         </h1>
 
+        {/* --- Quick Finder Card --- */}
+        <div className="bg-slate-800/70 border border-white/20 rounded-xl p-4 mb-8 max-w-3xl mx-auto shadow-xl">
+          <h2 className="text-2xl font-semibold mb-3 text-center">Quick Finder</h2>
+          <p className="text-sm text-slate-200 mb-4 text-center">
+            Enter 1RM and select a percentage to get the rounded target weight (ends with 0 or 5).
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div>
+              <label className="block mb-1">1RM Max (lb)</label>
+              <input
+                type="number"
+                min={1}
+                value={oneRepMax}
+                onChange={(e) => setOneRepMax(e.target.value)}
+                className="w-full px-3 py-2 rounded bg-slate-700 border border-white placeholder-white"
+                placeholder="e.g. 315"
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Percentage</label>
+              <select
+                value={percent}
+                onChange={(e) => setPercent(parseInt(e.target.value, 10))}
+                className="w-full px-3 py-2 rounded bg-slate-700 border border-white"
+              >
+                {PERCENTAGES.map(p => (
+                  <option key={p} value={p}>
+                    {p}%{PERCENT_REPS[p] ? ` (${PERCENT_REPS[p]} reps)` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block mb-1">Target Weight (lb)</label>
+              <input
+                type="text"
+                value={targetWeight}
+                readOnly
+                className="w-full px-3 py-2 rounded bg-slate-900 border border-white/50 text-center font-semibold"
+                placeholder="—"
+              />
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <button
+              onClick={handleRedirect}
+              disabled={!targetWeight}
+              className="bg-slate-600 hover:bg-slate-300 hover:text-slate-900 transition px-6 py-2 rounded-lg border border-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Go to Plate Calculator →
+            </button>
+          </div>
+        </div>
+
+        {/* CSV Actions */}
         <div className="flex gap-3 justify-center mb-6">
           <button
             onClick={handleCopyCsv}
@@ -124,6 +197,7 @@ export default function PercentilesPage() {
           </button>
         </div>
 
+        {/* Table */}
         <div className="rounded-xl shadow-2xl overflow-hidden border border-white/20">
           <div className="overflow-x-auto">
             <table className="min-w-[900px] w-full text-sm">

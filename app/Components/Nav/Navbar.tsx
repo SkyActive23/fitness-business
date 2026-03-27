@@ -51,12 +51,19 @@ export const Navbar = () => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className='hover:bg-slate-500 text-xl p-2 rounded flex items-center'
               >
-                Calculators
+                Tools
                 <FontAwesomeIcon icon={faChevronDown} className='ml-2' />
               </button>
 
               {isDropdownOpen && (
                 <div className='absolute right-0 mt-2 w-48 bg-slate-700 rounded shadow-md z-50'>
+                  <Link
+                    href='/calculators/timer'
+                    className='block px-4 py-2 hover:bg-slate-600'
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    Interval Timer
+                  </Link>
                   <Link
                     href='/calculators/max'
                     className='block px-4 py-2 hover:bg-slate-600'

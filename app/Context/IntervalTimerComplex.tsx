@@ -27,9 +27,12 @@ type IntervalTimerContextType = {
   currentInterval: number;
   timeLeft: number;
   isRunning: boolean;
+
   isFullscreen: boolean;
+  isPseudoFullscreen: boolean;
   isWidgetOpen: boolean;
   setIsWidgetOpen: (value: boolean) => void;
+
   timerRef: React.RefObject<HTMLDivElement | null>;
 
   workTotal: number;
@@ -61,6 +64,7 @@ export function IntervalTimerProvider({
   const timerRef = useRef<HTMLDivElement | null>(null);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
   const [workMinutes, setWorkMinutes] = useState('0');
@@ -114,16 +118,16 @@ export function IntervalTimerProvider({
   };
 
   const startClock = () => {
-        if (workTotal <= 0) return;
+    if (workTotal <= 0) return;
 
-        if (phase === 'idle' || phase === 'done') {
-            setPhase('work');
-            setCurrentInterval(1);
-            setTimeLeft(workTotal);
-        }
+    if (phase === 'idle' || phase === 'done') {
+      setPhase('work');
+      setCurrentInterval(1);
+      setTimeLeft(workTotal);
+    }
 
-        setIsRunning(true);
-    };
+    setIsRunning(true);
+  };
 
   const pauseClock = () => {
     setIsRunning(false);
@@ -134,23 +138,52 @@ export function IntervalTimerProvider({
     setPhase('idle');
     setCurrentInterval(1);
     setTimeLeft(workTotal > 0 ? workTotal : 0);
+    setIsWidgetOpen(false);
+    setIsPseudoFullscreen(false);
+
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
   };
 
   const toggleFullscreen = async () => {
+    const el = timerRef.current;
+    if (!el) return;
+
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+    const isIPhoneLike = /iPhone|iPod/i.test(ua);
+
     try {
-      if (!document.fullscreenElement) {
-        await timerRef.current?.requestFullscreen();
-      } else {
+      if (document.fullscreenElement) {
         await document.exitFullscreen();
+        setIsPseudoFullscreen(false);
+        return;
       }
+
+      if (isPseudoFullscreen) {
+        setIsPseudoFullscreen(false);
+        return;
+      }
+
+      if (typeof el.requestFullscreen === 'function' && !isIPhoneLike) {
+        await el.requestFullscreen();
+        setIsPseudoFullscreen(false);
+        return;
+      }
+
+      setIsPseudoFullscreen(true);
     } catch (error) {
       console.error('Fullscreen error:', error);
+      setIsPseudoFullscreen((prev) => !prev);
     }
   };
 
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
+      if (!document.fullscreenElement) {
+        setIsPseudoFullscreen(false);
+      }
     };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -249,6 +282,7 @@ export function IntervalTimerProvider({
         timeLeft,
         isRunning,
         isFullscreen,
+        isPseudoFullscreen,
         isWidgetOpen,
         setIsWidgetOpen,
         timerRef,

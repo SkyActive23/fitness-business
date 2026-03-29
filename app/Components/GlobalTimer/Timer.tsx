@@ -33,9 +33,9 @@ export default function GlobalIntervalClock() {
   const [isDraggingWidget, setIsDraggingWidget] = useState(false);
   const [isDraggingClosed, setIsDraggingClosed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [shouldOpenMobileFullscreen, setShouldOpenMobileFullscreen] = useState(false);
 
   const closedButtonRef = useRef<HTMLButtonElement | null>(null);
+  const mobileFullscreenRef = useRef<HTMLDivElement | null>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const dragStartRef = useRef({ x: 0, y: 0 });
   const hasMovedRef = useRef(false);
@@ -52,28 +52,6 @@ export default function GlobalIntervalClock() {
       window.removeEventListener('resize', checkMobile);
     };
   }, []);
-
-  useEffect(() => {
-    if (!isMobile) return;
-    if (!shouldOpenMobileFullscreen) return;
-    if (!isWidgetOpen) return;
-    if (!timerRef.current) return;
-    if (fullscreenActive) return;
-
-    const id = window.requestAnimationFrame(() => {
-      toggleFullscreen();
-      setShouldOpenMobileFullscreen(false);
-    });
-
-    return () => window.cancelAnimationFrame(id);
-  }, [
-    isMobile,
-    shouldOpenMobileFullscreen,
-    isWidgetOpen,
-    timerRef,
-    toggleFullscreen,
-    fullscreenActive,
-  ]);
 
   const defaultClosedStyle = isMobile
     ? undefined
@@ -219,19 +197,39 @@ export default function GlobalIntervalClock() {
       {!fullscreenActive && hasActiveTimer && (
         <>
           {isMobile ? (
-            <button
-              onClick={() => {
-                setIsWidgetOpen(true);
-                setShouldOpenMobileFullscreen(true);
-              }}
-              className={mobileClosedClasses}
-            >
-              <div className="flex items-center justify-center">
-                <span className="text-lg font-bold">
-                  {phaseLabel} {formatTime(timeLeft)}
-                </span>
+            <div className={mobileClosedClasses}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col">
+                  <span className="text-xs uppercase tracking-[0.25em] text-white/70">
+                    {phaseLabel}
+                  </span>
+                  <span className="text-lg font-bold">
+                    {formatTime(timeLeft)}
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setIsWidgetOpen(true)}
+                    className="rounded-lg bg-black/25 px-3 py-2 text-sm font-bold hover:bg-white hover:text-slate-900 transition"
+                  >
+                    Open
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      setIsWidgetOpen(true);
+                      setTimeout(async () => {
+                        await toggleFullscreen(mobileFullscreenRef.current);
+                      }, 50);
+                    }}
+                    className="rounded-lg bg-black/25 px-3 py-2 text-sm font-bold hover:bg-white hover:text-slate-900 transition"
+                  >
+                    Full
+                  </button>
+                </div>
               </div>
-            </button>
+            </div>
           ) : (
             !isWidgetOpen && (
               <button
@@ -252,9 +250,10 @@ export default function GlobalIntervalClock() {
         </>
       )}
 
-      {((isMobile && fullscreenActive) || (!isMobile && isWidgetOpen && hasActiveTimer)) && (
+      {((isMobile && (fullscreenActive || isWidgetOpen) && hasActiveTimer) ||
+        (!isMobile && isWidgetOpen && hasActiveTimer)) && (
         <div
-          ref={timerRef}
+          ref={isMobile ? mobileFullscreenRef : timerRef}
           style={widgetDraggedStyle}
           className={`fixed z-[100] bg-gradient-to-br ${timerTheme} text-white shadow-2xl border border-white/20 ${
             fullscreenActive
@@ -299,13 +298,15 @@ export default function GlobalIntervalClock() {
 
               <div className="flex gap-2">
                 <button
-                  onClick={toggleFullscreen}
+                  onClick={() =>
+                    toggleFullscreen(isMobile ? mobileFullscreenRef.current : timerRef.current)
+                  }
                   className="rounded-xl bg-black/25 px-4 py-2 font-bold hover:bg-white hover:text-slate-900 transition"
                 >
                   {fullscreenActive ? 'Exit Full Screen' : 'Full'}
                 </button>
 
-                {!fullscreenActive && !isMobile && (
+                {!fullscreenActive && (
                   <button
                     onClick={() => setIsWidgetOpen(false)}
                     className="rounded-xl bg-black/25 px-4 py-2 font-bold hover:bg-white hover:text-slate-900 transition"

@@ -49,7 +49,7 @@ type IntervalTimerContextType = {
   startClock: () => void;
   pauseClock: () => void;
   resetClock: () => void;
-  toggleFullscreen: () => Promise<void>;
+  toggleFullscreen: (target?: HTMLDivElement | null) => Promise<void>;
 };
 
 const IntervalTimerContext = createContext<IntervalTimerContextType | undefined>(
@@ -135,19 +135,13 @@ export function IntervalTimerProvider({
 
   const resetClock = () => {
     setIsRunning(false);
-    setPhase('idle');
+    setPhase('work');
     setCurrentInterval(1);
     setTimeLeft(workTotal > 0 ? workTotal : 0);
-    setIsWidgetOpen(false);
-    setIsPseudoFullscreen(false);
-
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
-    }
   };
 
-  const toggleFullscreen = async () => {
-    const el = timerRef.current;
+  const toggleFullscreen = async (target?: HTMLDivElement | null) => {
+    const el = target ?? timerRef.current;
     if (!el) return;
 
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
@@ -174,7 +168,7 @@ export function IntervalTimerProvider({
       setIsPseudoFullscreen(true);
     } catch (error) {
       console.error('Fullscreen error:', error);
-      setIsPseudoFullscreen((prev) => !prev);
+      setIsPseudoFullscreen(true);
     }
   };
 

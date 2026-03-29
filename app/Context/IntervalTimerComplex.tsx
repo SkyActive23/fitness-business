@@ -62,6 +62,7 @@ export function IntervalTimerProvider({
   children: React.ReactNode;
 }) {
   const timerRef = useRef<HTMLDivElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false);
@@ -79,20 +80,15 @@ export function IntervalTimerProvider({
   const [isRunning, setIsRunning] = useState(false);
 
   const workTotal = useMemo(() => {
-    const mins = Number(workMinutes) || 0;
-    const secs = Number(workSeconds) || 0;
-    return mins * 60 + secs;
+    return (Number(workMinutes) || 0) * 60 + (Number(workSeconds) || 0);
   }, [workMinutes, workSeconds]);
 
   const restTotal = useMemo(() => {
-    const mins = Number(restMinutes) || 0;
-    const secs = Number(restSeconds) || 0;
-    return mins * 60 + secs;
+    return (Number(restMinutes) || 0) * 60 + (Number(restSeconds) || 0);
   }, [restMinutes, restSeconds]);
 
   const totalIntervals = useMemo(() => {
-    const value = Number(intervals) || 1;
-    return Math.max(1, value);
+    return Math.max(1, Number(intervals) || 1);
   }, [intervals]);
 
   const totalSessionTime = useMemo(() => {
@@ -102,8 +98,7 @@ export function IntervalTimerProvider({
   const currentPhaseTotal = useMemo(() => {
     if (phase === 'work') return workTotal;
     if (phase === 'rest') return restTotal;
-    if (phase === 'idle') return workTotal;
-    return 0;
+    return workTotal;
   }, [phase, workTotal, restTotal]);
 
   const progressPercent = useMemo(() => {
@@ -112,113 +107,162 @@ export function IntervalTimerProvider({
   }, [currentPhaseTotal, timeLeft]);
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const startClock = () => {
+  // 🔊 AUDIO ENGINE
+  const getAudioContext = async () => {
+    if (!audioContextRef.current) {
+      const AudioCtx =
+        window.AudioContext ||
+        // @ts-ignore
+        window.webkitAudioContext;
+
+      audioContextRef.current = new AudioCtx();
+    }
+
+    if (audioContextRef.current.state === 'suspended') {
+      await audioContextRef.current.resume();
+    }
+
+    return audioContextRef.current;
+  };
+
+  const playBeep = async (
+    frequency = 1200,
+    duration = 0.12,
+    volume = 0.2,
+    type: OscillatorType = 'square'
+  ) => {
+    const ctx = await getAudioContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  };
+
+  const playStartBeep = async () => {
+    await playBeep(1400, 0.15, 0.25, 'square');
+  };
+
+  const playRestBeep = async () => {
+    await playBeep(900, 0.18, 0.18, 'triangle');
+  };
+
+  const playCountdownBeep = async () => {
+    await playBeep(1800, 0.06, 0.2, 'square');
+  };
+
+  const playCompleteBeep = async () => {
+    await playBeep(1200, 0.12, 0.25);
+    setTimeout(() => {
+      playBeep(1600, 0.15, 0.3);
+    }, 140);
+  };
+
+  const startClock = async () => {
     if (workTotal <= 0) return;
 
-    if (phase === 'idle' || phase === 'done') {
+    const fresh = phase === 'idle' || phase === 'done';
+
+    if (fresh) {
       setPhase('work');
       setCurrentInterval(1);
       setTimeLeft(workTotal);
+      await playStartBeep();
     }
 
     setIsRunning(true);
   };
 
-  const pauseClock = () => {
-    setIsRunning(false);
-  };
+  const pauseClock = () => setIsRunning(false);
 
   const resetClock = () => {
     setIsRunning(false);
     setPhase('work');
     setCurrentInterval(1);
-    setTimeLeft(workTotal > 0 ? workTotal : 0);
+    setTimeLeft(workTotal);
   };
 
   const toggleFullscreen = async (target?: HTMLDivElement | null) => {
     const el = target ?? timerRef.current;
     if (!el) return;
 
-    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    const isIPhoneLike = /iPhone|iPod/i.test(ua);
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      setIsPseudoFullscreen(false);
+      return;
+    }
 
     try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-        setIsPseudoFullscreen(false);
-        return;
-      }
-
-      if (isPseudoFullscreen) {
-        setIsPseudoFullscreen(false);
-        return;
-      }
-
-      if (typeof el.requestFullscreen === 'function' && !isIPhoneLike) {
-        await el.requestFullscreen();
-        setIsPseudoFullscreen(false);
-        return;
-      }
-
-      setIsPseudoFullscreen(true);
-    } catch (error) {
-      console.error('Fullscreen error:', error);
+      await el.requestFullscreen();
+    } catch {
       setIsPseudoFullscreen(true);
     }
   };
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
+    const onChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
-      if (!document.fullscreenElement) {
-        setIsPseudoFullscreen(false);
-      }
+      if (!document.fullscreenElement) setIsPseudoFullscreen(false);
     };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
   }, []);
-
-  useEffect(() => {
-    if (phase === 'idle') {
-      setTimeLeft(workTotal > 0 ? workTotal : 0);
-    }
-  }, [workTotal, phase]);
 
   useEffect(() => {
     if (!isRunning) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev > 1) return prev - 1;
+        if (prev > 1) {
+          const next = prev - 1;
+
+          if (next <= 3) {
+            playCountdownBeep();
+          }
+
+          return next;
+        }
 
         if (phase === 'work') {
           if (currentInterval >= totalIntervals) {
             setPhase('done');
             setIsRunning(false);
+            playCompleteBeep();
             return 0;
           }
 
           if (restTotal > 0) {
             setPhase('rest');
+            playRestBeep();
             return restTotal;
           }
 
-          setCurrentInterval((old) => old + 1);
-          setPhase('work');
+          setCurrentInterval((c) => c + 1);
+          playStartBeep();
           return workTotal;
         }
 
         if (phase === 'rest') {
-          setCurrentInterval((old) => old + 1);
+          setCurrentInterval((c) => c + 1);
           setPhase('work');
+          playStartBeep();
           return workTotal;
         }
 
@@ -302,9 +346,7 @@ export function IntervalTimerProvider({
 }
 
 export function useIntervalTimer() {
-  const context = useContext(IntervalTimerContext);
-  if (!context) {
-    throw new Error('useIntervalTimer must be used within IntervalTimerProvider');
-  }
-  return context;
+  const ctx = useContext(IntervalTimerContext);
+  if (!ctx) throw new Error('Must be used inside provider');
+  return ctx;
 }

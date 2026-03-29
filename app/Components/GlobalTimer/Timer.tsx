@@ -199,7 +199,14 @@ export default function GlobalIntervalClock() {
           {isMobile ? (
             <div className={mobileClosedClasses}>
               <div className="flex items-center justify-between gap-3">
-                <div className="flex flex-col">
+                <button
+                  onClick={() => setIsWidgetOpen(true)}
+                  className="rounded-lg bg-black/25 px-3 py-2 text-sm font-bold hover:bg-white hover:text-slate-900 transition"
+                >
+                  Open
+                </button>
+
+                <div className="flex flex-col items-center">
                   <span className="text-xs uppercase tracking-[0.25em] text-white/70">
                     {phaseLabel}
                   </span>
@@ -208,26 +215,17 @@ export default function GlobalIntervalClock() {
                   </span>
                 </div>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setIsWidgetOpen(true)}
-                    className="rounded-lg bg-black/25 px-3 py-2 text-sm font-bold hover:bg-white hover:text-slate-900 transition"
-                  >
-                    Open
-                  </button>
-
-                  <button
-                    onClick={async () => {
-                      setIsWidgetOpen(true);
-                      setTimeout(async () => {
-                        await toggleFullscreen(mobileFullscreenRef.current);
-                      }, 50);
-                    }}
-                    className="rounded-lg bg-black/25 px-3 py-2 text-sm font-bold hover:bg-white hover:text-slate-900 transition"
-                  >
-                    Full
-                  </button>
-                </div>
+                <button
+                  onClick={async () => {
+                    setIsWidgetOpen(true);
+                    setTimeout(async () => {
+                      await toggleFullscreen(mobileFullscreenRef.current);
+                    }, 50);
+                  }}
+                  className="rounded-lg bg-black/25 px-3 py-2 text-sm font-bold hover:bg-white hover:text-slate-900 transition"
+                >
+                  Full
+                </button>
               </div>
             </div>
           ) : (
@@ -259,8 +257,8 @@ export default function GlobalIntervalClock() {
             fullscreenActive
               ? 'inset-0 rounded-none border-0 p-6 md:p-12'
               : position
-              ? 'rounded-3xl p-6'
-              : widgetDefaultClasses
+                ? 'rounded-3xl p-6'
+                : widgetDefaultClasses
           }`}
         >
           <div

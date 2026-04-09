@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useTransition } from 'react';
 import Link from 'next/link';
+import { useState, useTransition } from 'react';
 import { updateAssessment } from './actions';
 
 type AssessmentRow = {
@@ -38,24 +38,55 @@ type AthleteGroup = {
   athletes: AthleteRow[];
 };
 
+type EditState = {
+  assessmentDate: string;
+  squat: string;
+  bench: string;
+  clean: string;
+  cmj: string;
+  singleLegCmjRight: string;
+  singleLegCmjLeft: string;
+  sprint20m: string;
+  mod505: string;
+};
+
 function displayValue(value: number | string | null | undefined) {
   return value === null || value === undefined || value === '' ? '—' : value;
 }
 
+function buildEditState(latest: AssessmentRow): EditState {
+  return {
+    assessmentDate: latest.assessment_date ?? '',
+    squat: latest.squat == null ? '' : String(latest.squat),
+    bench: latest.bench == null ? '' : String(latest.bench),
+    clean: latest.clean == null ? '' : String(latest.clean),
+    cmj: latest.cmj == null ? '' : String(latest.cmj),
+    singleLegCmjRight:
+      latest.single_leg_cmj_right == null ? '' : String(latest.single_leg_cmj_right),
+    singleLegCmjLeft:
+      latest.single_leg_cmj_left == null ? '' : String(latest.single_leg_cmj_left),
+    sprint20m: latest.sprint_20m == null ? '' : String(latest.sprint_20m),
+    mod505: latest.mod_505 == null ? '' : String(latest.mod_505),
+  };
+}
+
 function CellInput({
   name,
-  defaultValue,
+  value,
   type = 'text',
+  onChange,
 }: {
   name: string;
-  defaultValue: string | number;
+  value: string;
   type?: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
     <input
       name={name}
       type={type}
-      defaultValue={defaultValue}
+      value={value}
+      onChange={onChange}
       className="w-full min-w-0 rounded-lg border border-slate-500 bg-slate-700 px-3 py-2 text-white outline-none focus:border-white"
     />
   );
@@ -69,6 +100,19 @@ export default function AthleteAssessmentTable({
   const [message, setMessage] = useState('');
   const [pendingKey, setPendingKey] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const [editingAssessmentId, setEditingAssessmentId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<EditState>({
+    assessmentDate: '',
+    squat: '',
+    bench: '',
+    clean: '',
+    cmj: '',
+    singleLegCmjRight: '',
+    singleLegCmjLeft: '',
+    sprint20m: '',
+    mod505: '',
+  });
 
   const groupedAthletes: AthleteGroup[] = Object.values(
     athletes.reduce((acc, athlete) => {
@@ -89,27 +133,60 @@ export default function AthleteAssessmentTable({
     }, {} as Record<string, AthleteGroup>)
   );
 
-  async function handleUpdate(formData: FormData) {
-    const assessmentId = String(formData.get('assessmentId') || '');
+  function startEditing(latest: AssessmentRow) {
+    setMessage('');
+    setEditingAssessmentId(latest.id);
+    setEditForm(buildEditState(latest));
+  }
+
+  function cancelEditing() {
+    if (isPending) return;
+    setEditingAssessmentId(null);
+    setEditForm({
+      assessmentDate: '',
+      squat: '',
+      bench: '',
+      clean: '',
+      cmj: '',
+      singleLegCmjRight: '',
+      singleLegCmjLeft: '',
+      sprint20m: '',
+      mod505: '',
+    });
+  }
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSave(assessmentId: string) {
     setPendingKey(assessmentId);
     setMessage('');
 
     startTransition(async () => {
       const result = await updateAssessment({
         assessmentId,
-        assessmentDate: String(formData.get('assessmentDate') || ''),
-        squat: String(formData.get('squat') || ''),
-        bench: String(formData.get('bench') || ''),
-        clean: String(formData.get('clean') || ''),
-        cmj: String(formData.get('cmj') || ''),
-        singleLegCmjRight: String(formData.get('singleLegCmjRight') || ''),
-        singleLegCmjLeft: String(formData.get('singleLegCmjLeft') || ''),
-        sprint20m: String(formData.get('sprint20m') || ''),
-        mod505: String(formData.get('mod505') || ''),
+        assessmentDate: editForm.assessmentDate,
+        squat: editForm.squat,
+        bench: editForm.bench,
+        clean: editForm.clean,
+        cmj: editForm.cmj,
+        singleLegCmjRight: editForm.singleLegCmjRight,
+        singleLegCmjLeft: editForm.singleLegCmjLeft,
+        sprint20m: editForm.sprint20m,
+        mod505: editForm.mod505,
       });
 
-      setMessage(result?.error ?? 'Assessment updated successfully.');
+      if (result?.error) {
+        setMessage(result.error);
+        setPendingKey(null);
+        return;
+      }
+
+      setMessage('Assessment updated successfully.');
       setPendingKey(null);
+      setEditingAssessmentId(null);
     });
   }
 
@@ -120,7 +197,7 @@ export default function AthleteAssessmentTable({
           Athlete Assessment Table
         </h2>
         <p className="text-slate-300">
-          Edit the latest assessment directly inside the table.
+          View the latest assessment and edit rows only when needed.
         </p>
       </section>
 
@@ -213,95 +290,168 @@ export default function AthleteAssessmentTable({
                         );
                       }
 
+                      const isEditing = editingAssessmentId === latest.id;
+
                       return (
                         <tr
                           key={athlete.id}
                           className={index % 2 === 0 ? 'bg-slate-700' : 'bg-slate-600'}
                         >
-                          <td colSpan={15} className="p-0">
-                            <form action={handleUpdate}>
-                              <input type="hidden" name="assessmentId" value={latest.id} />
-                              <table className="min-w-full table-auto text-sm text-white">
-                                <tbody>
-                                  <tr>
-                                    <td className="px-4 py-3 whitespace-nowrap align-middle">
-                                      <Link
-                                        href={`/dashboard/athletes/profile/${athlete.id}`}
-                                        className="font-semibold text-white underline underline-offset-4 hover:text-slate-200"
-                                      >
-                                        {athlete.first_name}
-                                      </Link>
-                                    </td>
-                                    <td className="px-4 py-3 whitespace-nowrap align-middle">
-                                      <Link
-                                        href={`/dashboard/athletes/profile/${athlete.id}`}
-                                        className="font-semibold text-white underline underline-offset-4 hover:text-slate-200"
-                                      >
-                                        {athlete.last_name}
-                                      </Link>
-                                    </td>
-                                    <td className="px-4 py-3 whitespace-nowrap align-middle">
-                                      {displayValue(athlete.position)}
-                                    </td>
-                                    <td className="px-4 py-3 whitespace-nowrap align-middle">
-                                      {displayValue(athlete.height)}
-                                    </td>
-                                    <td className="px-4 py-3 whitespace-nowrap align-middle">
-                                      {displayValue(athlete.weight)}
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput
-                                        name="assessmentDate"
-                                        type="date"
-                                        defaultValue={latest.assessment_date ?? ''}
-                                      />
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput name="cmj" defaultValue={latest.cmj ?? ''} />
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput
-                                        name="singleLegCmjRight"
-                                        defaultValue={latest.single_leg_cmj_right ?? ''}
-                                      />
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput
-                                        name="singleLegCmjLeft"
-                                        defaultValue={latest.single_leg_cmj_left ?? ''}
-                                      />
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput
-                                        name="sprint20m"
-                                        defaultValue={latest.sprint_20m ?? ''}
-                                      />
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput name="mod505" defaultValue={latest.mod_505 ?? ''} />
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput name="squat" defaultValue={latest.squat ?? ''} />
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput name="bench" defaultValue={latest.bench ?? ''} />
-                                    </td>
-                                    <td className="px-4 py-3 align-middle">
-                                      <CellInput name="clean" defaultValue={latest.clean ?? ''} />
-                                    </td>
-                                    <td className="px-4 py-3 whitespace-nowrap align-middle">
-                                      <button
-                                        type="submit"
-                                        disabled={isPending && pendingKey === latest.id}
-                                        className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-800 shadow hover:scale-[1.02] transition"
-                                      >
-                                        {isPending && pendingKey === latest.id ? 'Saving...' : 'Save'}
-                                      </button>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </form>
+                          <td className="px-4 py-3 whitespace-nowrap align-middle">
+                            <Link
+                              href={`/dashboard/athletes/profile/${athlete.id}`}
+                              className="font-semibold text-white underline underline-offset-4 hover:text-slate-200"
+                            >
+                              {athlete.first_name}
+                            </Link>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap align-middle">
+                            <Link
+                              href={`/dashboard/athletes/profile/${athlete.id}`}
+                              className="font-semibold text-white underline underline-offset-4 hover:text-slate-200"
+                            >
+                              {athlete.last_name}
+                            </Link>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap align-middle">
+                            {displayValue(athlete.position)}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap align-middle">
+                            {displayValue(athlete.height)}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap align-middle">
+                            {displayValue(athlete.weight)}
+                          </td>
+
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="assessmentDate"
+                                type="date"
+                                value={editForm.assessmentDate}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.assessment_date)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="cmj"
+                                value={editForm.cmj}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.cmj)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="singleLegCmjRight"
+                                value={editForm.singleLegCmjRight}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.single_leg_cmj_right)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="singleLegCmjLeft"
+                                value={editForm.singleLegCmjLeft}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.single_leg_cmj_left)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="sprint20m"
+                                value={editForm.sprint20m}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.sprint_20m)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="mod505"
+                                value={editForm.mod505}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.mod_505)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="squat"
+                                value={editForm.squat}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.squat)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="bench"
+                                value={editForm.bench}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.bench)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            {isEditing ? (
+                              <CellInput
+                                name="clean"
+                                value={editForm.clean}
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              displayValue(latest.clean)
+                            )}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap align-middle">
+                            {isEditing ? (
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleSave(latest.id)}
+                                  disabled={isPending && pendingKey === latest.id}
+                                  className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-800 shadow hover:scale-[1.02] transition"
+                                >
+                                  {isPending && pendingKey === latest.id ? 'Saving...' : 'Save'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelEditing}
+                                  disabled={isPending}
+                                  className="rounded-lg bg-slate-500 px-4 py-2 font-semibold text-white shadow hover:scale-[1.02] transition"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => startEditing(latest)}
+                                className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-800 shadow hover:scale-[1.02] transition"
+                              >
+                                Edit
+                              </button>
+                            )}
                           </td>
                         </tr>
                       );

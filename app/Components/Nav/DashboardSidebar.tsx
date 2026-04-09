@@ -12,6 +12,8 @@ import {
   faUsers,
   faClipboardList,
   faWrench,
+  faDumbbell,
+  faUsersRectangle,
 } from '@fortawesome/free-solid-svg-icons';
 import { getSportHref } from '@/app/lib/getSportHref';
 import SidebarLogoutButton from '@/app/Components/Nav/SidebarLogoutButton';
@@ -29,6 +31,9 @@ export default function DashboardSidebar({ sports = [] }: SidebarProps) {
   const baseLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: faGaugeHigh },
     { href: '/dashboard/athletes', label: 'Athletes', icon: faUsers },
+    { href: '/dashboard/exercise-library', label: 'Exercise Library', icon: faDumbbell },
+    { href: '/dashboard/classes', label: 'Classes', icon: faUsersRectangle },
+    { href: '/dashboard/workouts', label: 'Workouts', icon: faDumbbell },
   ];
 
   const assessmentsOpen = openSection === 'assessments';
